@@ -6,6 +6,8 @@ package compose
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -38,6 +40,7 @@ func status(cmd *cobra.Command, args []string) (rcErr error) {
 	}
 
 	composes = weldr.SortComposeStatusV0(composes)
+	writer := tabwriter.NewWriter(os.Stdout, 0, 4, 1, '\t', tabwriter.AlignRight)
 	for i := range composes {
 		c := composes[i]
 
@@ -59,9 +62,10 @@ func status(cmd *cobra.Command, args []string) (rcErr error) {
 			size = fmt.Sprintf("%d", c.Size)
 		}
 
-		fmt.Printf("%s %-8s %s %-15s %s %-16s %s\n", c.ID, c.Status, t.Format("Mon Jan 2 15:04:05 2006"),
+		fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", c.ID, c.Status, t.Format("Mon Jan 2 15:04:05 2006"),
 			c.Blueprint, c.Version, c.Type, size)
 	}
+	writer.Flush()
 
 	return rcErr
 }
